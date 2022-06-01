@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tailwind Todo</title>
+
+  <style>
+    .htmx-swapping {
+      opacity: 0;
+      transition: opacity 0.4s ease-out;
+    }
+  </style>
+</head>
+<body class="bg-sky-500">
+
+  <nav class="flex items-center justify-between px-4 py-6 text-center bg-gradient-to-r from-cyan-500 to-sky-500">
+    <a href="/" class="text-3xl text-white">Tailwind Todo</a>
+  </nav>
+
+  <div class="md:w-4/5 my-6 mx-auto p-6 lg:p-10 bg-white rounded-xl">
+    <form 
+      class="flex mb-6 space-x-4"
+      hx-post="/add_todo/"
+      hx-target="#todos"
+      hx-swap="afterend"
+    >
+      <input type="text" name="title" class="title flex-1 px-4 py-3 bg-gray-200 rounded-xl" placeholder="The title">
+      <button class="px-3 pb-2 rounded-xl text-white text-4xl bg-cyan-500 hover:bg-cyan-600">+</button>
+    </form>
+
+    <div class="flex py-3 rounded-xl bg-gray-100">
+      <div class="w-4/5">
+        <p class="px-6 text-lg font-medium text-gray-500 uppercase">Title</p>
+      </div>
+      
+      <div class="d-none md-block w-1/5 px-6 text-right">
+        <p class="text-lg font-medium text-gray-500 uppercase">Actions</p>
+      </div>
+    </div>
+
+    <div class="divide-y divide-gray-200 mt-3" id="todos">
+      {% for todo in todos %}
+        {% include 'add_todo.html' %}
+      {% endfor %}
+    </div>
+  </div>
+
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@1.6.1"></script>
+  <script>
+    document.body.addEventListener('htmx:configRequest', (event) => {
+      event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+    });
+
+    document.body.addEventListener('htmx:afterRequest', (event) => {
+      document.querySelector('input.title').value = '';
+    });
+  </script>
+</body>
+</html>
